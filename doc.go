@@ -28,6 +28,7 @@
 //		func serveContent(w http.ResponseWriter, r *http.Request) {
 //			// Add GZIP-encoding if supported by the client.
 //			writer := web.NewGzipResponseWriter(w)
+//			defer writer.Close()
 //
 //			f, err := os.Open("." + r.RequestURI)
 //			if err != nil {
