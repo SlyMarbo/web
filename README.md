@@ -1,7 +1,6 @@
 web
 ===
 
-<<<<<<< HEAD
 Example use:
 ```go
 package main
@@ -65,6 +64,3 @@ func main() {
 	}
 }
 ```
-=======
-Web is a small helper library in Go for building web servers.
->>>>>>> 801f3d5c633e01fb0e9c1a75d7388c4643e6f264
