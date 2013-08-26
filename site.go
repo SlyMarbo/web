@@ -59,6 +59,12 @@ func NewSecureSite(name string, port int, certFile, keyFile string, notFound htt
 	}
 }
 
+// Always uses the given handler for any request.
+func (s *Site) Always(handler http.Handler) {
+	matchFunc := func(_ string) bool { return true }
+	s.handlers = append(s.handlers, &Matcher{matchFunc, handler})
+}
+
 // Contains uses the given handler when the request path contains
 // any of the given pattern strings.
 func (s *Site) Contains(handler http.Handler, patterns ...string) {

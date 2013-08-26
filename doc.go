@@ -49,7 +49,7 @@
 //
 //		func main() {
 //			redirector := web.NewSite("example.com", 80, notFound)
-//			redirector.HasPrefix(web.RedirectToHttpsHandler, "/")
+//			redirector.Always(web.RedirectToHttpsHandler)
 //
 //			site := web.NewSite("example.com", 443, notFound)
 //			site.Equals(http.HandleFunc(serveHTML), "/", "/index.html")
