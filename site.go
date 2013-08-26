@@ -137,9 +137,9 @@ type Matcher struct {
 // MatchFunc is used to identify desired request paths.
 type MatchFunc func(string) bool
 
-func makeMatchFunc(s1 string, m func(string, string) bool) MatchFunc {
-	return func(s2 string) bool {
-		return m(s1, s2)
+func makeMatchFunc(pattern string, m func(string, string) bool) MatchFunc {
+	return func(path string) bool {
+		return m(path, pattern)
 	}
 }
 
