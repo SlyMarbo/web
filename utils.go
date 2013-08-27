@@ -40,7 +40,7 @@ func RedirectToHTTPS(w http.ResponseWriter, r *http.Request) {
 
 // RedirectToHttpsHandler can be used as an http.Handler which uses
 // RedirectToHTTPS above.
-var RedirectToHttpsHandler = http.HandlerFunc(RedirectToHTTPS)
+var RedirectToHttpsHandler = Handler(RedirectToHTTPS)
 
 // RedirectToHTTP takes an HTTPS request and redirects it to the same
 // page, but using HTTP. Be careful not to use in serving HTTP, or
@@ -54,4 +54,11 @@ func RedirectToHTTP(w http.ResponseWriter, r *http.Request) {
 
 // RedirectToHttpHandler can be used as an http.Handler which uses
 // RedirectToHTTP above.
-var RedirectToHttpHandler = http.HandlerFunc(RedirectToHTTP)
+var RedirectToHttpHandler = Handler(RedirectToHTTP)
+
+// Handler can be used as a shorter http.HandlerFunc.
+type Handler func(http.ResponseWriter, *http.Request)
+
+func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h(w, r)
+}

@@ -52,8 +52,8 @@
 //			redirector.Always(web.RedirectToHttpsHandler)
 //
 //			site := web.NewSite("example.com", 443, notFound)
-//			site.Equals(http.HandleFunc(serveHTML), "/", "/index.html")
-//			site.HasPrefix(http.HandleFunc(serveContent), "/")
+//			site.Equals(web.Handler(serveHTML), "/", "/index.html")
+//			site.HasPrefix(web.Handler(serveContent), "/")
 //
 //			err := new(web.Server).Add(redirector).Add(site).Serve()
 //			if err != nil {

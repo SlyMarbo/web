@@ -17,7 +17,7 @@ type Site struct {
 	Port     int
 	auth     []string
 	handlers []*Matcher
-	notFound http.HandlerFunc
+	notFound Handler
 }
 
 // NewSite builds a new HTTP Site, using the given domain name
@@ -30,7 +30,7 @@ type Site struct {
 //
 //		// http://example.com:8080
 //		site := NewSite("example.com", 8080, nil)
-func NewSite(name string, port int, notFound http.HandlerFunc) *Site {
+func NewSite(name string, port int, notFound Handler) *Site {
 	return &Site{
 		Name:     name,
 		Port:     port,
@@ -49,7 +49,7 @@ func NewSite(name string, port int, notFound http.HandlerFunc) *Site {
 //
 //		// https://example.com:8080
 //		site := NewSecureSite("example.com", 8080, "cert.pem", "key.pem", nil)
-func NewSecureSite(name string, port int, certFile, keyFile string, notFound http.HandlerFunc) *Site {
+func NewSecureSite(name string, port int, certFile, keyFile string, notFound Handler) *Site {
 	return &Site{
 		Name:     name,
 		Port:     port,
