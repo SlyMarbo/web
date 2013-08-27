@@ -10,7 +10,7 @@ import (
 // on the same port and interface.
 type ReverseProxy struct {
 	proxy    map[string]http.Handler // Domain to handler.
-	NotFound http.Handler
+	NotFound Handler
 }
 
 func NewProxy() *ReverseProxy {
@@ -45,7 +45,7 @@ func (p *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		host, _, err = net.SplitHostPort(r.Host)
 		if err != nil {
 			if p.NotFound != nil {
-				p.NotFound.ServeHTTP(w, r)
+				p.NotFound(w, r)
 			}
 			return
 		}
@@ -59,6 +59,6 @@ func (p *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if p.NotFound != nil {
-		p.NotFound.ServeHTTP(w, r)
+		p.NotFound(w, r)
 	}
 }
