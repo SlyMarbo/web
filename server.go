@@ -74,9 +74,13 @@ func (s *Server) Serve() error {
 
 			// Make sure all sites on one port use TLS or none do.
 			auth := sites[0].auth != nil
+			usingSpdy := sites[0].SPDY
 			for i := 1; i < len(sites); i++ {
 				if auth != (sites[i].auth != nil) {
 					return errors.New("Multiple sites on the same port with mixed HTTPS usage.")
+				}
+				if usingSpdy != sites[i].SPDY {
+					return errors.New("Multiple sites on the same port with mixed SPDY usage.")
 				}
 			}
 
@@ -84,6 +88,9 @@ func (s *Server) Serve() error {
 			addr := fmt.Sprintf(":%d", port)
 			proxy := NewProxy()
 			server := &http.Server{Addr: addr, Handler: proxy}
+			if usingSpdy {
+				spdy.AddSPDY(server)
+			}
 			tlsConf := &tls.Config{NextProtos: []string{"http/1.1"}}
 			tlsConf.Certificates = make([]tls.Certificate, len(sites))
 			var err error
