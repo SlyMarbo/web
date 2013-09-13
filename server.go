@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/SlyMarbo/spdy"
 	"net"
 	"net/http"
 )
@@ -15,13 +16,25 @@ type Server struct {
 	sites []*Site
 }
 
+// NewServer creates and initialises a Server.
+func NewServer() *Server {
+	s := new(Server)
+	s.sites = make([]*Site, 0, 1)
+	return s
+}
+
+// NewServerFromSites creates a Server with the
+// provided sites.
+func NewServerFromSites(sites ...*Site) *Server {
+	s := new(Server)
+	s.sites = sites
+	return s
+}
+
 // Add takes a Site and adds it to the Server's collection.
 // Add returns the server, so multiple Add calls can be
 // chained together.
 func (s *Server) Add(site *Site) *Server {
-	if s.sites == nil || cap(s.sites) == 0 {
-		s.sites = make([]*Site, 0, 1)
-	}
 	s.sites = append(s.sites, site)
 	return s
 }
@@ -49,7 +62,11 @@ func (s *Server) Serve() error {
 		if len(sites) == 1 {
 			site := sites[0]
 			if site.auth != nil {
-				go serveHTTPS(site.Port, site, site.auth[0], site.auth[1], errChan)
+				if site.SPDY {
+					go serveSPDY(site.Port, site, site.auth[0], site.auth[1], errChan)
+				} else {
+					go serveHTTPS(site.Port, site, site.auth[0], site.auth[1], errChan)
+				}
 			} else {
 				go serveHTTP(site.Port, site, errChan)
 			}
@@ -104,6 +121,14 @@ func (s *Server) Serve() error {
 
 	// Keep running until an error occurs.
 	return <-errChan
+}
+
+func serveSPDY(port int, handler http.Handler, certFile, keyFile string, errChan chan<- error) {
+	addr := fmt.Sprintf(":%d", port)
+	err := spdy.ListenAndServeTLS(addr, certFile, keyFile, handler)
+	if err != nil {
+		errChan <- err
+	}
 }
 
 func serveHTTPS(port int, handler http.Handler, certFile, keyFile string, errChan chan<- error) {

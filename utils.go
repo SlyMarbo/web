@@ -56,6 +56,55 @@ func RedirectToHTTP(w http.ResponseWriter, r *http.Request) {
 // RedirectToHTTP above.
 var RedirectToHttpHandler = Handler(RedirectToHTTP)
 
+// Redirect can be used as an http.Handler which redirects all requests
+// to the enclosed string.
+//
+//	site := web.NewSite("example.com", 80, nil)
+//	site.Always(Redirect("www.example.com")) // Redirects all requests to this URL.
+//
+type Redirect string
+
+func (s Redirect) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, string(s), 301)
+}
+
+// UsePath creates a Handler which will call the given
+// PathHandler with a fixed path, allowing multiple URLs
+// to refer to the same content more simply.
+//
+//	site := web.NewSite("example.com", 80, nil)
+//
+//	// Requests to / and /index.html will both be served
+//	// by calling serveHTML with the http.ResponseWriter,
+//	// the *http.Request, and the path "content/index.html".
+//	site.Equals(web.UsePath("content/index.html", serveHTML), "/", "/index.html")
+//
+func UsePath(path string, handler PathHandler) http.Handler {
+	return Handler(func(w http.ResponseWriter, r *http.Request) {
+		handler(w, r, path)
+	})
+}
+
+// UsePrefix works similarly to UsePath, but will simply
+// prepend the request path with the given prefix.
+//
+//	site := web.NewSite("example.com", 80, nil)
+//
+//	// Requests ending in .jpg or .png will all be served
+//	// by calling serveHTML with the http.ResponseWriter,
+//	// the *http.Request, and the path "images" + request.URL.Path.
+//	site.HasSuffix(web.UsePrefix{"images", serveImage}, ".jpg", ".png")
+//
+func UsePrefix(prefix string, handler PathHandler) http.Handler {
+	return Handler(func(w http.ResponseWriter, r *http.Request) {
+		handler(w, r, prefix+r.URL.Path)
+	})
+}
+
+// PathHandler represents a handler which takes a string
+// describing the filepath to the resource to serve.
+type PathHandler func(http.ResponseWriter, *http.Request, string)
+
 // Handler can be used as a shorter http.HandlerFunc.
 type Handler func(http.ResponseWriter, *http.Request)
 

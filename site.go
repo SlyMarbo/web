@@ -11,10 +11,16 @@ import (
 // path would match multiple handlers, the first matching handler
 // registered is used.
 //
+// Optionally, the SPDY protocol can be enabled by setting the
+// SPDY field to true. This uses github.com/SlyMarbo/spdy and
+// will still accept HTTPS requests, in addition to SPDY. This
+// can only be enabled on secure sites.
+//
 // Site must be created with NewSite or NewSecureSite.
 type Site struct {
 	Name     string
 	Port     int
+	SPDY     bool
 	auth     []string
 	handlers []*Matcher
 	notFound Handler
