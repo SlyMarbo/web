@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -110,4 +111,27 @@ type Handler func(http.ResponseWriter, *http.Request)
 
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h(w, r)
+}
+
+// PageViews is a simple structure
+// for recording page view counts
+// in a thread-safe manner.
+type PageViews struct {
+	sync.Mutex
+	count int64
+}
+
+// Add increments the count.
+func (p *PageViews) Add() {
+	p.Lock()
+	p.count++
+	p.Unlock()
+}
+
+// Count returns the number of page views.
+func (p *PageViews) Count() (count int64) {
+	p.Lock()
+	count = p.count
+	p.Unlock()
+	return count
 }
