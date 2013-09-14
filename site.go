@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -112,6 +113,16 @@ func (s *Site) HasPrefix(handler http.Handler, patterns ...string) {
 func (s *Site) HasSuffix(handler http.Handler, patterns ...string) {
 	for _, pattern := range patterns {
 		matchFunc := makeMatchFunc(pattern, strings.HasSuffix)
+		s.handlers = append(s.handlers, &Matcher{matchFunc, handler})
+	}
+}
+
+// UseRegex uses the given handler when the request path matches
+// any of the given regex pattern strings.
+func (s *Site) UseRegex(handler http.Handler, patterns ...string) {
+	for _, pattern := range patterns {
+		regex := regexp.MustCompile(pattern)
+		matchFunc := makeMatchFunc(pattern, regex.MatchString)
 		s.handlers = append(s.handlers, &Matcher{matchFunc, handler})
 	}
 }
