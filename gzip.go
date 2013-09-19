@@ -1,15 +1,21 @@
+// Copyright 2013 Jamie Hall. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package web
 
 import (
 	"compress/gzip"
+	"github.com/SlyMarbo/spdy"
 	"net/http"
 	"strings"
 )
 
-// Gzip determines whether the given request headers claim support
-// for GZIP-encoded responses.
-func Gzip(request *http.Request) bool {
-	return strings.Contains(request.Header.Get("Accept-Encoding"), "gzip")
+// Gzip determines whether either the given request headers claim support
+// for GZIP-encoded responses, or the connection is using SPDY, in which
+// case GZIP support is guaranteed.
+func Gzip(w http.ResponseWriter, r *http.Request) bool {
+	return spdy.UsingSPDY(w) || strings.Contains(r.Header.Get("Accept-Encoding"), "gzip")
 }
 
 // GzipResponseWriter is used to provide GZIP encoding when permitted
@@ -25,7 +31,7 @@ type GzipResponseWriter struct {
 func NewGzipResponseWriter(w http.ResponseWriter, r *http.Request) *GzipResponseWriter {
 	gzw := new(GzipResponseWriter)
 	gzw.w = w
-	if Gzip(r) {
+	if Gzip(w, r) {
 		w.Header().Set("Content-Encoding", "gzip")
 		gzw.g = gzip.NewWriter(w)
 	}
@@ -38,7 +44,7 @@ func NewGzipResponseWriter(w http.ResponseWriter, r *http.Request) *GzipResponse
 func NewGzipResponseWriterLevel(w http.ResponseWriter, r *http.Request, level int) (*GzipResponseWriter, error) {
 	gzw := new(GzipResponseWriter)
 	gzw.w = w
-	if Gzip(r) {
+	if Gzip(w, r) {
 		w.Header().Set("Content-Encoding", "gzip")
 		g, err := gzip.NewWriterLevel(w, level)
 		if err != nil {

@@ -1,3 +1,7 @@
+// Copyright 2013 Jamie Hall. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package web
 
 import (
@@ -122,7 +126,7 @@ func (s *Site) HasSuffix(handler http.Handler, patterns ...string) {
 func (s *Site) UseRegex(handler http.Handler, patterns ...string) {
 	for _, pattern := range patterns {
 		regex := regexp.MustCompile(pattern)
-		matchFunc := makeMatchFunc(pattern, regex.MatchString)
+		matchFunc := regex.MatchString
 		s.handlers = append(s.handlers, &Matcher{matchFunc, handler})
 	}
 }
