@@ -31,7 +31,8 @@ func Cache(w http.ResponseWriter, modTime time.Time, duration time.Duration) {
 }
 
 // May be useful in cache durations.
-var OneYear time.Duration = time.Hour * 24 * 366
+// Slightly less than one year, to conform to RFC 2616.
+var OneYear time.Duration = time.Hour * 24 * 364
 
 // RedirectToHTTPS takes an HTTP request and redirects it to the same
 // page, but using HTTPS. Be careful not to use in serving HTTPS, or
