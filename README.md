@@ -1,7 +1,7 @@
 web
 ===
 
-Example use:
+Source code:
 ```go
 package main
 
